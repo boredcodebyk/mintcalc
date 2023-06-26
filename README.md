@@ -1,16 +1,13 @@
-# mintcalc
+# Mnt Calculator
+A simple calculator and converter app with Material Design 3 inspired by Windows Calculator
 
-A new Flutter project.
+## Features
 
-## Getting Started
+ - Standard calulator
+ - Date calulation
+ - Simple converter (Angle, Time, Data, Length, Area, Volume, etc...)
 
-This project is a starting point for a Flutter application.
+## Planned updates
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ - Scientific calculator
+ - Calculator history
