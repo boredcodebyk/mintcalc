@@ -1,11 +1,11 @@
 # Mint Calculator
-A simple calculator and converter app with Material Design 3 inspired by Windows Calculator
+A simple calculator and unit converter app with Material Design 3 inspired by Windows Calculator
 
 ## Features
 
- - Standard calulator
- - Date calulation
- - Simple converter (Angle, Time, Data, Length, Area, Volume, etc...)
+ - Standard Calculator 
+ - Date Calculator 
+ - Simple unit converter (Angle, Time, Data, Length, Area, Volume, etc...)
 
 ## Screenshots
 
