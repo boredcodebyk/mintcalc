@@ -1,0 +1,1 @@
+A simple calculator and converter app with Material Design 3 inspired by Windows Calculator.
