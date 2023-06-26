@@ -1,0 +1,40 @@
+name: mintcalc
+description: A simple calculator and converter app.
+
+publish_to: 'none'
+
+version: 1.0.0+100
+
+environment:
+  sdk: '>=3.0.5 <4.0.0'
+
+dependencies:
+  animations: ^2.0.7
+  cupertino_icons: ^1.0.2
+  duration: ^3.0.12
+  dynamic_color: ^1.6.5
+  flutter:
+    sdk: flutter
+  flutter_svg: ^2.0.7
+  intl: ^0.18.1
+  math_expressions: ^2.4.0
+  provider: ^6.0.5
+  shared_preferences: ^2.1.2
+  units_converter: ^2.1.0
+  url_launcher: ^6.1.11
+
+dev_dependencies:
+  flutter_lints: ^2.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+
+  uses-material-design: true
+  assets:
+    - assets/github-mark-white.svg
+    - assets/github-mark.svg
+  fonts:
+    - family: Manrope
+      fonts:
+        - asset: fonts/Manrope/Manrope-Regular.ttf
