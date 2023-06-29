@@ -52,7 +52,7 @@ jobs:
         working-directory: ${{ env.APK_BUILD_DIR }}
         env:
           ENCODED_STRING: ${{ secrets.KEY_JKS }}
-        run: echo $ENCODED_STRING | base64 --decode > android/key.jks
+        run: echo $ENCODED_STRING | base64 -di > android/key.jks
       
       - name: Dependencies
         working-directory: ${{ env.APK_BUILD_DIR }}
