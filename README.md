@@ -1,6 +1,11 @@
 # Mint Calculator
 A simple calculator and unit converter app with Material Design 3 inspired by Windows Calculator
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="80">](https://f-droid.org/en/packages/bored.codebyk.mintcalc/)
+
+
 ## Features
 
  - Standard Calculator 
