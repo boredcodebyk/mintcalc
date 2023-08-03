@@ -449,7 +449,10 @@ class _StdCalcState extends State<StdCalc> {
     }
     return notTonalButton
         ? FilledButton(
-            onPressed: () => _doMath(valb),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              _doMath(valb);
+            },
             child: Text(
               val,
               style: const TextStyle(
@@ -458,7 +461,10 @@ class _StdCalcState extends State<StdCalc> {
             ),
           )
         : FilledButton.tonal(
-            onPressed: () => _doMath(valb),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              _doMath(valb);
+            },
             child: Text(
               val,
               style: const TextStyle(
