@@ -240,7 +240,7 @@ class _AboutState extends State<About> {
                 ),
                 title: const Text("Github"),
                 onTap: () async {
-                  const url = 'https://github.com/boredcodebyk';
+                  const url = 'https://github.com/boredcodebyk/mintcalc';
                   if (!await launchUrl(Uri.parse(url),
                       mode: LaunchMode.externalApplication)) {
                     throw Exception('Could not launch $url');
