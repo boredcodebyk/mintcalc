@@ -53,33 +53,42 @@ class SettingsPage extends StatelessWidget {
                         sigFigInput.text = settings.sigFig.toString();
                         return Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: SimpleDialog(children: [
-                            TextField(
-                              textAlign: TextAlign.end,
-                              controller: sigFigInput,
-                              onChanged: (value) => value.isNotEmpty
-                                  ? settings.sigFig = int.parse(value)
-                                  : settings.sigFig = 7,
+                          child: AlertDialog(
+                            title: Text(
+                              "Set significant figures",
+                              style: Theme.of(context).textTheme.headlineMedium,
                             ),
-                            Row(
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text("Cancel"),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    settings.sigFig =
-                                        int.parse(sigFigInput.text);
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text("Set"),
+                                const Text(
+                                    "This settings is exclusively for unit convertors"),
+                                TextField(
+                                  textAlign: TextAlign.end,
+                                  keyboardType: TextInputType.number,
+                                  controller: sigFigInput,
+                                  onChanged: (value) => value.isNotEmpty
+                                      ? settings.sigFig = int.parse(value)
+                                      : settings.sigFig = 7,
                                 ),
                               ],
-                            )
-                          ]),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Cancel"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  settings.sigFig = int.parse(sigFigInput.text);
+                                  Navigator.pop(context);
+                                },
+                                child: const Text("Set"),
+                              ),
+                            ],
+                          ),
                         );
                       }),
                 ),
@@ -87,7 +96,7 @@ class SettingsPage extends StatelessWidget {
                   leading: const Icon(Icons.info_outline),
                   title: const Text("About"),
                   onTap: () =>
-                      Navigator.push(context, _createRoute(const Abouts())),
+                      Navigator.push(context, _createRoute(const About())),
                 )
               ],
             ),
@@ -182,36 +191,17 @@ class _ThemePageState extends State<ThemePage> {
   }
 }
 
-class Abouts extends StatefulWidget {
-  const Abouts({super.key});
+class About extends StatefulWidget {
+  const About({super.key});
 
   @override
-  State<Abouts> createState() => _AboutsState();
+  State<About> createState() => _AboutState();
 }
 
-class _AboutsState extends State<Abouts> {
-  static const platform =
-      MethodChannel('bored.codebyk.mintcalc/androidversion');
-
-  String _appVersion = "";
-
-  Future<String> appVersion() async {
-    final result = await platform.invokeMethod('getAppVersion');
-    return await result;
-  }
-
-  void getVersion() async {
-    final appv = await appVersion();
-    setState(() {
-      _appVersion = appv;
-    });
-  }
-
+class _AboutState extends State<About> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => getVersion());
   }
 
   @override
@@ -226,18 +216,18 @@ class _AboutsState extends State<Abouts> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: [
-              ListTile(
-                leading: const Icon(Icons.info_outline),
-                title: const Text("App Version"),
-                subtitle: Text(_appVersion),
+              const ListTile(
+                leading: Icon(Icons.info_outline),
+                title: Text("App Version"),
+                subtitle: Text("1.1.0"),
               ),
               ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: const Text("Licenses"),
                 onTap: () => showLicensePage(
                     context: context,
-                    applicationName: "Mint Task",
-                    applicationVersion: _appVersion),
+                    applicationName: "Mint Calculator",
+                    applicationVersion: "1.1.0"),
               ),
               ListTile(
                 leading: SvgPicture.asset(
@@ -266,6 +256,7 @@ class _AboutsState extends State<Abouts> {
 }
 
 extension StringExtension on String {
+  /// Capitalize the first letter of a word
   String capitalize() {
     return "${this[0].toUpperCase()}${substring(1).toLowerCase()}";
   }

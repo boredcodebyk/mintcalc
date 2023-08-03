@@ -19,6 +19,7 @@ class _DateCalcState extends State<DateCalc>
     return DefaultTabController(
       length: _pages.length,
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: const TabBar(tabs: [
           Tab(
             text: "Date Difference",
@@ -27,7 +28,7 @@ class _DateCalcState extends State<DateCalc>
             text: "Add/Subtract Days",
           )
         ]),
-        body: TabBarView(children: _pages),
+        body: SafeArea(child: TabBarView(children: _pages)),
       ),
     );
   }
@@ -121,63 +122,67 @@ class _BuildDateDiffState extends State<BuildDateDiff>
     super.build(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("From"),
-          const SizedBox(
-            height: 8,
-          ),
-          InkWell(
-            child: Chip(
-                label: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Icon(Icons.date_range_outlined),
-                Text(DateFormat.yMMMd().format(selectedDate1).toString()),
-              ],
-            )),
-            onTap: () => _selectDate1(context),
-          ),
-          const SizedBox(
-            height: 36,
-          ),
-          const Text("To"),
-          const SizedBox(
-            height: 8,
-          ),
-          InkWell(
-            child: Chip(
-                label: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.date_range_outlined),
-                Text(DateFormat.yMMMd().format(selectedDate2).toString()),
-              ],
-            )),
-            onTap: () => _selectDate2(context),
-          ),
-          const SizedBox(
-            height: 36,
-          ),
-          const Text("Difference"),
-          const SizedBox(
-            height: 8,
-          ),
-          selectedDate1.difference(selectedDate2).inMilliseconds == 0
-              ? const Text(
-                  "Same day",
-                  style: TextStyle(fontSize: 36),
-                )
-              : Text(
-                  formatMilliseconds(daysBetween(selectedDate1, selectedDate2)),
-                  style: const TextStyle(fontSize: 36),
-                )
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("From"),
+            const SizedBox(
+              height: 8,
+            ),
+            InkWell(
+              child: Chip(
+                  label: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.date_range_outlined),
+                  Text(DateFormat.yMMMd().format(selectedDate1).toString()),
+                ],
+              )),
+              onTap: () => _selectDate1(context),
+            ),
+            const SizedBox(
+              height: 36,
+            ),
+            const Text("To"),
+            const SizedBox(
+              height: 8,
+            ),
+            InkWell(
+              child: Chip(
+                  label: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.date_range_outlined),
+                  Text(DateFormat.yMMMd().format(selectedDate2).toString()),
+                ],
+              )),
+              onTap: () => _selectDate2(context),
+            ),
+            const SizedBox(
+              height: 36,
+            ),
+            const Text("Difference"),
+            const SizedBox(
+              height: 8,
+            ),
+            selectedDate1.difference(selectedDate2).inMilliseconds == 0
+                ? const Text(
+                    "Same day",
+                    style: TextStyle(fontSize: 36),
+                  )
+                : Text(
+                    formatMilliseconds(
+                        daysBetween(selectedDate1, selectedDate2)),
+                    style: const TextStyle(fontSize: 36),
+                  )
+          ],
+        ),
       ),
     );
   }
@@ -219,139 +224,141 @@ class _AddSubdaysState extends State<AddSubdays>
     super.build(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("From"),
-          const SizedBox(
-            height: 8,
-          ),
-          InkWell(
-            child: Chip(
-                label: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text("From"),
+            const SizedBox(
+              height: 8,
+            ),
+            InkWell(
+              child: Chip(
+                  label: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Icon(Icons.date_range_outlined),
+                  Text(DateFormat.yMMMd().format(fromDate).toString()),
+                ],
+              )),
+              onTap: () => _selectDate(context),
+            ),
+            const SizedBox(
+              height: 36,
+            ),
+            GridView(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3),
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
               children: [
-                const Icon(Icons.date_range_outlined),
-                Text(DateFormat.yMMMd().format(fromDate).toString()),
+                DropdownMenu(
+                  width: 96,
+                  dropdownMenuEntries: List.generate(
+                      99,
+                      (index) => DropdownMenuEntry(
+                            style: ButtonStyle(
+                              fixedSize: MaterialStateProperty.all(
+                                const Size.fromWidth(96),
+                              ),
+                            ),
+                            value: index,
+                            label: index.toString(),
+                          ),
+                      growable: false),
+                  initialSelection: 0,
+                  label: const Text("Year"),
+                  onSelected: (value) => setState(() {
+                    newSelectedYear = value!;
+                  }),
+                ),
+                DropdownMenu(
+                  width: 96,
+                  dropdownMenuEntries: List.generate(
+                      99,
+                      (index) => DropdownMenuEntry(
+                            style: ButtonStyle(
+                              fixedSize: MaterialStateProperty.all(
+                                const Size.fromWidth(96),
+                              ),
+                            ),
+                            value: index,
+                            label: index.toString(),
+                          ),
+                      growable: false),
+                  initialSelection: 0,
+                  label: const Text("Month"),
+                  onSelected: (value) => setState(() {
+                    newSelectedMonth = value!;
+                  }),
+                ),
+                DropdownMenu(
+                  width: 96,
+                  dropdownMenuEntries: List.generate(
+                      99,
+                      (index) => DropdownMenuEntry(
+                            style: ButtonStyle(
+                              fixedSize: MaterialStateProperty.all(
+                                const Size.fromWidth(96),
+                              ),
+                            ),
+                            value: index,
+                            label: index.toString(),
+                          ),
+                      growable: false),
+                  initialSelection: 0,
+                  label: const Text("Day"),
+                  onSelected: (value) => setState(() {
+                    newSelectedDay = value!;
+                  }),
+                ),
               ],
-            )),
-            onTap: () => _selectDate(context),
-          ),
-          const SizedBox(
-            height: 36,
-          ),
-          GridView(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3),
-            shrinkWrap: true,
-            children: [
-              DropdownMenu(
-                width: 96,
-                dropdownMenuEntries: List.generate(
-                    99,
-                    (index) => DropdownMenuEntry(
-                          style: ButtonStyle(
-                            fixedSize: MaterialStateProperty.all(
-                              const Size.fromWidth(96),
-                            ),
-                          ),
-                          value: index,
-                          label: index.toString(),
-                        ),
-                    growable: false),
-                initialSelection: 0,
-                label: const Text("Year"),
-                onSelected: (value) => setState(() {
-                  newSelectedYear = value!;
-                }),
-              ),
-              DropdownMenu(
-                width: 96,
-                dropdownMenuEntries: List.generate(
-                    99,
-                    (index) => DropdownMenuEntry(
-                          style: ButtonStyle(
-                            fixedSize: MaterialStateProperty.all(
-                              const Size.fromWidth(96),
-                            ),
-                          ),
-                          value: index,
-                          label: index.toString(),
-                        ),
-                    growable: false),
-                initialSelection: 0,
-                label: const Text("Month"),
-                onSelected: (value) => setState(() {
-                  newSelectedMonth = value!;
-                }),
-              ),
-              DropdownMenu(
-                width: 96,
-                dropdownMenuEntries: List.generate(
-                    99,
-                    (index) => DropdownMenuEntry(
-                          style: ButtonStyle(
-                            fixedSize: MaterialStateProperty.all(
-                              const Size.fromWidth(96),
-                            ),
-                          ),
-                          value: index,
-                          label: index.toString(),
-                        ),
-                    growable: false),
-                initialSelection: 0,
-                label: const Text("Day"),
-                onSelected: (value) => setState(() {
-                  newSelectedDay = value!;
-                }),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 24,
-          ),
-          GridView(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2),
-            shrinkWrap: true,
-            children: [
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Adding:"),
-                  Text(
-                    DateFormat.yMMMd()
-                        .format(DateTime(
-                            fromDate.year + newSelectedYear,
-                            fromDate.month + newSelectedMonth,
-                            fromDate.day + newSelectedDay))
-                        .toString(),
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                ],
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Subtracting:"),
-                  Text(
-                    DateFormat.yMMMd()
-                        .format(DateTime(
-                            fromDate.year - newSelectedYear,
-                            fromDate.month - newSelectedMonth,
-                            fromDate.day - newSelectedDay))
-                        .toString(),
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                ],
-              )
-            ],
-          )
-        ],
+            ),
+            GridView(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2),
+              shrinkWrap: true,
+              children: [
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Adding:"),
+                    Text(
+                      DateFormat.yMMMd()
+                          .format(DateTime(
+                              fromDate.year + newSelectedYear,
+                              fromDate.month + newSelectedMonth,
+                              fromDate.day + newSelectedDay))
+                          .toString(),
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                  ],
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Subtracting:"),
+                    Text(
+                      DateFormat.yMMMd()
+                          .format(DateTime(
+                              fromDate.year - newSelectedYear,
+                              fromDate.month - newSelectedMonth,
+                              fromDate.day - newSelectedDay))
+                          .toString(),
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                  ],
+                )
+              ],
+            )
+          ],
+        ),
       ),
     );
   }

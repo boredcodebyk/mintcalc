@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 import 'package:units_converter/units_converter.dart';
 
 import '../../models/settings_model.dart';
@@ -33,9 +34,34 @@ class _LengthConvState extends State<LengthConv> {
   void _bkspc() {
     if (inputAFN.hasFocus) {
       if (inputA.text.isNotEmpty) {
-        setState(() {
-          inputA.text = inputA.text.substring(0, inputA.text.length - 1);
-        });
+        if (inputA.selection.isCollapsed) {
+          if (inputA.selection.baseOffset == inputA.text.length) {
+            setState(() {
+              inputA.text = inputA.text.substring(0, inputA.text.length - 1);
+            });
+            inputA.selection = TextSelection.fromPosition(
+                TextPosition(offset: inputA.text.length));
+          } else {
+            setState(() {
+              inputA.value = inputA.value.replaced(
+                  TextRange(
+                      start: inputA.selection.baseOffset - 1,
+                      end: inputA.selection.baseOffset),
+                  "");
+            });
+            inputA.selection = TextSelection.fromPosition(
+                TextPosition(offset: inputA.selection.start));
+          }
+        } else {
+          setState(() {
+            inputA.value = inputA.value.replaced(
+                TextRange(
+                    start: inputA.selection.start, end: inputA.selection.end),
+                "");
+          });
+          inputA.selection = TextSelection.fromPosition(
+              TextPosition(offset: inputA.selection.end));
+        }
         if (inputA.text.isNotEmpty) {
           length.convert(selectedlengthA, double.parse(inputA.text));
 
@@ -45,18 +71,42 @@ class _LengthConvState extends State<LengthConv> {
           inputB.text = unitDetails[selectedlengthB] ?? "";
         } else {
           setState(() {
-            inputA.text = "";
-            inputB.text = "";
+            inputA.clear();
+            inputB.clear();
           });
         }
       }
     } else if (inputBFN.hasFocus) {
       if (inputB.text.isNotEmpty) {
-        setState(() {
-          inputB.text = inputB.text.substring(0, inputB.text.length - 1);
-        });
-
-        if (inputA.text.isNotEmpty) {
+        if (inputB.selection.isCollapsed) {
+          if (inputB.selection.baseOffset == inputB.text.length) {
+            setState(() {
+              inputB.text = inputB.text.substring(0, inputB.text.length - 1);
+            });
+            inputB.selection = TextSelection.fromPosition(
+                TextPosition(offset: inputB.text.length));
+          } else {
+            setState(() {
+              inputB.value = inputB.value.replaced(
+                  TextRange(
+                      start: inputB.selection.baseOffset - 1,
+                      end: inputB.selection.baseOffset),
+                  "");
+            });
+            inputB.selection = TextSelection.fromPosition(
+                TextPosition(offset: inputB.selection.start));
+          }
+        } else {
+          setState(() {
+            inputB.value = inputB.value.replaced(
+                TextRange(
+                    start: inputB.selection.start, end: inputB.selection.end),
+                "");
+          });
+          inputB.selection = TextSelection.fromPosition(
+              TextPosition(offset: inputB.selection.end));
+        }
+        if (inputB.text.isNotEmpty) {
           length.convert(selectedlengthB, double.parse(inputB.text));
           units = length.getAll();
 
@@ -64,8 +114,8 @@ class _LengthConvState extends State<LengthConv> {
           inputA.text = unitDetails[selectedlengthA] ?? "";
         } else {
           setState(() {
-            inputA.text = "";
-            inputB.text = "";
+            inputA.clear();
+            inputB.clear();
           });
         }
       }
@@ -153,205 +203,255 @@ class _LengthConvState extends State<LengthConv> {
     length.significantFigures = settings.sigFig;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Column(
+      body: SafeArea(
+        child: ResponsiveBuilder(
+          builder: (context, sizingInformation) {
+            if (sizingInformation.deviceScreenType == DeviceScreenType.tablet) {
+              return OrientationBuilder(
+                builder: (context, orientation) {
+                  if (orientation == Orientation.landscape) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: _inputView(context, 48),
+                        ),
+                        Expanded(child: _keypad(context, 1.42))
+                      ],
+                    );
+                  } else {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: _inputView(context, 48),
+                        ),
+                        _keypad(context, 2)
+                      ],
+                    );
+                  }
+                },
+              );
+            }
+            return OrientationBuilder(
+              builder: (context, orientation) {
+                if (orientation == Orientation.landscape) {
+                  return Row(
+                    children: [
+                      Expanded(child: _inputView(context, 32)),
+                      Expanded(child: _keypad(context, 2.4)),
+                    ],
+                  );
+                } else {
+                  return Column(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: _inputView(context, 48),
+                      ),
+                      _keypad(context, 1.8)
+                    ],
+                  );
+                }
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _keypad(BuildContext context, double cellSizeRatio) {
+    return GridView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(8),
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: cellSizeRatio),
+      children: [
+        FilledButton(
+            onPressed: () {
+              if (inputBFN.hasFocus) {
+                inputBFN.unfocus();
+                inputAFN.requestFocus();
+              } else if (inputAFN.hasFocus) {
+                inputAFN.unfocus();
+                inputBFN.requestFocus();
+              }
+            },
+            child: Transform.rotate(
+              angle: 90 * pi / 180,
+              child: const Icon(
+                Icons.compare_arrows,
+                size: 32,
+              ),
+            )),
+        _buildButtons("C", false),
+        FilledButton(
+            onPressed: () => _bkspc(),
+            child: const Icon(
+              Icons.backspace_outlined,
+              size: 32,
+            )),
+        _buildButtons("7", true),
+        _buildButtons("8", true),
+        _buildButtons("9", true),
+        _buildButtons("4", true),
+        _buildButtons("5", true),
+        _buildButtons("6", true),
+        _buildButtons("1", true),
+        _buildButtons("2", true),
+        _buildButtons("3", true),
+        const FilledButton.tonal(
+            onPressed: null,
+            child: Text(
+              "\u00b1",
+              style: TextStyle(
+                fontSize: 32,
+              ),
+            )),
+        _buildButtons("0", true),
+        _buildButtons(".", true),
+      ],
+    );
+  }
+
+  Widget _inputView(BuildContext context, double fontsize) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Theme.of(context).colorScheme.secondaryContainer,
+      ),
+      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Theme.of(context).colorScheme.secondaryContainer,
+          DropdownMenu(
+            dropdownMenuEntries: List.generate(
+              units.length,
+              growable: false,
+              (index) {
+                var unit = units[index];
+                return DropdownMenuEntry(
+                  value: unit.name,
+                  label:
+                      unit.name.toString().split("LENGTH.").last.capitalize(),
+                );
+              },
             ),
-            padding: const EdgeInsets.all(8),
-            margin: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                DropdownMenu(
-                  dropdownMenuEntries: List.generate(
-                    units.length,
-                    growable: false,
-                    (index) {
-                      var unit = units[index];
-                      return DropdownMenuEntry(
-                        value: unit.name,
-                        label: unit.name
-                            .toString()
-                            .split("LENGTH.")
-                            .last
-                            .capitalize(),
-                      );
-                    },
-                  ),
-                  initialSelection: selectedlengthA,
-                  onSelected: (value) {
-                    setState(() {
-                      selectedlengthA = value;
-                    });
-                    if (inputAFN.hasFocus) {
-                      if (inputA.text.isNotEmpty) {
-                        length.convert(value, double.parse(inputA.text));
-                        units = length.getAll();
+            initialSelection: selectedlengthA,
+            onSelected: (value) {
+              setState(() {
+                selectedlengthA = value;
+              });
+              if (inputAFN.hasFocus) {
+                if (inputA.text.isNotEmpty) {
+                  length.convert(value, double.parse(inputA.text));
+                  units = length.getAll();
 
-                        _convValueBuild(units);
-                        inputB.text = unitDetails[selectedlengthB] ?? "";
-                      }
-                    } else if (inputBFN.hasFocus) {
-                      if (inputB.text.isNotEmpty) {
-                        length.convert(
-                            selectedlengthB, double.parse(inputB.text));
-                        units = length.getAll();
+                  _convValueBuild(units);
+                  inputB.text = unitDetails[selectedlengthB] ?? "";
+                }
+              } else if (inputBFN.hasFocus) {
+                if (inputB.text.isNotEmpty) {
+                  length.convert(selectedlengthB, double.parse(inputB.text));
+                  units = length.getAll();
 
-                        _convValueBuild(units);
-                        inputA.text = unitDetails[value] ?? "";
-                      }
-                    }
-                  },
-                ),
-                TextField(
-                  enableSuggestions: false,
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    suffixText: selectedlengthSymbolA.toString(),
-                  ),
-                  controller: inputA,
-                  focusNode: inputAFN,
-                  onChanged: (value) {
-                    if (inputAFN.hasFocus) {
-                      _conv(selectedlengthA, value, inputB);
-                    }
-                  },
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(RegExp(r'[a-z] [A-Z] :$'))
-                  ],
-                  style: const TextStyle(
-                    fontSize: 48,
-                  ),
-                  keyboardType: TextInputType.none,
-                ),
-                const Divider(),
-                DropdownMenu(
-                  dropdownMenuEntries: List.generate(
-                    units.length,
-                    growable: false,
-                    (index) {
-                      var unit = units[index];
-                      return DropdownMenuEntry(
-                        value: unit.name,
-                        label: unit.name
-                            .toString()
-                            .split("LENGTH.")
-                            .last
-                            .capitalize(),
-                      );
-                    },
-                  ),
-                  initialSelection: selectedlengthB,
-                  onSelected: (value) {
-                    setState(() {
-                      selectedlengthB = value;
-                    });
-                    if (inputBFN.hasFocus) {
-                      if (inputB.text.isNotEmpty) {
-                        length.convert(value, double.parse(inputB.text));
-                        units = length.getAll();
-
-                        _convValueBuild(units);
-                        inputA.text = unitDetails[selectedlengthA] ?? "";
-                      }
-                    } else if (inputAFN.hasFocus) {
-                      if (inputA.text.isNotEmpty) {
-                        length.convert(
-                            selectedlengthA, double.parse(inputA.text));
-                        units = length.getAll();
-
-                        _convValueBuild(units);
-                        inputB.text = unitDetails[value] ?? "";
-                      }
-                    }
-                  },
-                ),
-                TextField(
-                  enableSuggestions: false,
-                  textAlign: TextAlign.right,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    suffixText: selectedlengthSymbolB.toString(),
-                  ),
-                  controller: inputB,
-                  focusNode: inputBFN,
-                  onChanged: (value) {
-                    if (inputBFN.hasFocus) {
-                      _conv(selectedlengthB, value, inputA);
-                    }
-                  },
-                  inputFormatters: [
-                    FilteringTextInputFormatter.deny(RegExp(r'[a-z] [A-Z] :$'))
-                  ],
-                  style: const TextStyle(
-                    fontSize: 48,
-                  ),
-                  keyboardType: TextInputType.none,
-                ),
-              ],
-            ),
+                  _convValueBuild(units);
+                  inputA.text = unitDetails[value] ?? "";
+                }
+              }
+            },
           ),
-          GridView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.all(8),
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 1.8),
-            children: [
-              FilledButton(
-                  onPressed: () {
-                    if (inputBFN.hasFocus) {
-                      inputBFN.unfocus();
-                      inputAFN.requestFocus();
-                    } else if (inputAFN.hasFocus) {
-                      inputAFN.unfocus();
-                      inputBFN.requestFocus();
-                    }
-                  },
-                  child: Transform.rotate(
-                    angle: 90 * pi / 180,
-                    child: const Icon(
-                      Icons.compare_arrows,
-                      size: 32,
-                    ),
-                  )),
-              _buildButtons("C", false),
-              FilledButton(
-                  onPressed: () => _bkspc(),
-                  child: const Icon(
-                    Icons.backspace_outlined,
-                    size: 32,
-                  )),
-              _buildButtons("7", true),
-              _buildButtons("8", true),
-              _buildButtons("9", true),
-              _buildButtons("4", true),
-              _buildButtons("5", true),
-              _buildButtons("6", true),
-              _buildButtons("1", true),
-              _buildButtons("2", true),
-              _buildButtons("3", true),
-              const FilledButton.tonal(
-                  onPressed: null,
-                  child: Text(
-                    "\u00b1",
-                    style: TextStyle(
-                      fontSize: 32,
-                    ),
-                  )),
-              _buildButtons("0", true),
-              _buildButtons(".", true),
+          TextField(
+            enableSuggestions: false,
+            textAlign: TextAlign.right,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              suffixText: selectedlengthSymbolA.toString(),
+            ),
+            controller: inputA,
+            focusNode: inputAFN,
+            onChanged: (value) {
+              if (inputAFN.hasFocus) {
+                _conv(selectedlengthA, value, inputB);
+              }
+            },
+            inputFormatters: [
+              FilteringTextInputFormatter.deny(RegExp(r'[a-z] [A-Z] :$'))
             ],
-          )
+            style: TextStyle(
+              fontSize: fontsize,
+            ),
+            keyboardType: TextInputType.none,
+          ),
+          const Divider(),
+          DropdownMenu(
+            dropdownMenuEntries: List.generate(
+              units.length,
+              growable: false,
+              (index) {
+                var unit = units[index];
+                return DropdownMenuEntry(
+                  value: unit.name,
+                  label:
+                      unit.name.toString().split("LENGTH.").last.capitalize(),
+                );
+              },
+            ),
+            initialSelection: selectedlengthB,
+            onSelected: (value) {
+              setState(() {
+                selectedlengthB = value;
+              });
+              if (inputBFN.hasFocus) {
+                if (inputB.text.isNotEmpty) {
+                  length.convert(value, double.parse(inputB.text));
+                  units = length.getAll();
+
+                  _convValueBuild(units);
+                  inputA.text = unitDetails[selectedlengthA] ?? "";
+                }
+              } else if (inputAFN.hasFocus) {
+                if (inputA.text.isNotEmpty) {
+                  length.convert(selectedlengthA, double.parse(inputA.text));
+                  units = length.getAll();
+
+                  _convValueBuild(units);
+                  inputB.text = unitDetails[value] ?? "";
+                }
+              }
+            },
+          ),
+          TextField(
+            enableSuggestions: false,
+            textAlign: TextAlign.right,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              suffixText: selectedlengthSymbolB.toString(),
+            ),
+            controller: inputB,
+            focusNode: inputBFN,
+            onChanged: (value) {
+              if (inputBFN.hasFocus) {
+                _conv(selectedlengthB, value, inputA);
+              }
+            },
+            inputFormatters: [
+              FilteringTextInputFormatter.deny(RegExp(r'[a-z] [A-Z] :$'))
+            ],
+            style: TextStyle(
+              fontSize: fontsize,
+            ),
+            keyboardType: TextInputType.none,
+          ),
         ],
       ),
     );

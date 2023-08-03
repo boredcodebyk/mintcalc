@@ -23,9 +23,6 @@ class MainActivity: FlutterActivity() {
           if (call.method == "getAndroidVersion") {
             val android_V = getAndroidVersion()
             result.success(android_V)
-          } else if (call.method == "getAppVersion"){
-            val appV = getAppVersion()
-            result.success(appV)
           } else {
             result.notImplemented()
           }
@@ -36,9 +33,4 @@ class MainActivity: FlutterActivity() {
         return Build.VERSION.SDK_INT
     }
 
-    fun getAppVersion(): String {
-      val packageManager = applicationContext!!.packageManager
-      val info = packageManager.getPackageInfo(applicationContext!!.packageName, 0)
-      return info.versionName
-    }
 }

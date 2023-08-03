@@ -130,9 +130,10 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(appBarText),
         actions: [
           IconButton(
-              onPressed: () =>
-                  Navigator.push(context, _createRoute(SettingsPage())),
-              icon: const Icon(Icons.settings_outlined))
+            onPressed: () =>
+                Navigator.push(context, _createRoute(SettingsPage())),
+            icon: const Icon(Icons.settings_outlined),
+          ),
         ],
       ),
       body: _pages.elementAt(selectedIndex),
