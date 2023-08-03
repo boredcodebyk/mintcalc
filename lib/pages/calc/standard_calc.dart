@@ -462,7 +462,7 @@ class _StdCalcState extends State<StdCalc> {
           )
         : FilledButton.tonal(
             onPressed: () {
-              HapticFeedback.lightImpact();
+              HapticFeedback.mediumImpact();
               _doMath(valb);
             },
             child: Text(
