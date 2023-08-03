@@ -64,7 +64,7 @@ jobs:
 
       - name: Build APK
         working-directory: ${{ env.APK_BUILD_DIR }}
-        run: flutter build apk --release
+        run: flutter build apk --debug
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
