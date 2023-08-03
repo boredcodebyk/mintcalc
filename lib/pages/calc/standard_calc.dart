@@ -164,7 +164,6 @@ class _StdCalcState extends State<StdCalc> {
         output = input.text;
       });
     }
-    listHistory();
   }
 
   @override
@@ -399,10 +398,7 @@ class _StdCalcState extends State<StdCalc> {
       child: FutureBuilder(
           future: listHistory(),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              //print('project snapshot data is: ${projectSnap.data}');
-              return const CircularProgressIndicator.adaptive();
-            } else if (snapshot.connectionState == ConnectionState.none) {
+            if (!snapshot.hasData) {
               return const Center(
                 child: Text("History is Empty"),
               );
