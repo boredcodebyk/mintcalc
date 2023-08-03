@@ -28,8 +28,13 @@ class _StdCalcState extends State<StdCalc> {
       "input": input,
       "output": output,
     };
-    List _history = [];
-    _history.add(historyData);
+    List _history = jsonDecode(prefs.getString("history_key") ?? "[]");
+    if (_history.length >= 20) {
+      _history.removeAt(20);
+      _history.add(historyData);
+    } else {
+      _history.add(historyData);
+    }
     String history = jsonEncode(_history);
     await prefs.setString("history_key", history);
   }
@@ -37,6 +42,7 @@ class _StdCalcState extends State<StdCalc> {
   Future<List> listHistory() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final List listHistory = jsonDecode(prefs.getString("history_key") ?? "[]");
+
     return listHistory;
   }
 
@@ -86,6 +92,7 @@ class _StdCalcState extends State<StdCalc> {
           });
         }
       }
+      listHistory();
     } else if (val == "()") {
       if (input.selection.isCollapsed) {
         setState(() {
@@ -119,7 +126,6 @@ class _StdCalcState extends State<StdCalc> {
     }
     _inputScroll.animateTo(_inputScroll.position.maxScrollExtent + 1,
         duration: const Duration(milliseconds: 300), curve: Curves.ease);
-    listHistory();
   }
 
   void _bkspc() {
@@ -199,7 +205,7 @@ class _StdCalcState extends State<StdCalc> {
                                 child: _inputView(context),
                               ),
                               Expanded(
-                                child: _history(context),
+                                child: _history(context, false),
                               ),
                             ],
                           ),
@@ -216,7 +222,7 @@ class _StdCalcState extends State<StdCalc> {
                           child: Row(
                             children: [
                               Expanded(
-                                child: _history(context),
+                                child: _history(context, false),
                               ),
                               Expanded(
                                 child: _inputView(context),
@@ -320,7 +326,7 @@ class _StdCalcState extends State<StdCalc> {
                                   onPressed: () => Navigator.pop(context),
                                   icon: const Icon(Icons.close)),
                             ),
-                            Expanded(child: _history(context)),
+                            Expanded(child: _history(context, true)),
                           ],
                         )),
                       );
@@ -381,7 +387,8 @@ class _StdCalcState extends State<StdCalc> {
     );
   }
 
-  Widget _history(BuildContext context) {
+  Widget _history(BuildContext context, bool isPhone) {
+    bool isPhone = true;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -392,18 +399,44 @@ class _StdCalcState extends State<StdCalc> {
       child: FutureBuilder(
           future: listHistory(),
           builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              ListView.builder(
-                itemCount: snapshot.data?.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: snapshot.data?[index],
-                  );
-                },
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              //print('project snapshot data is: ${projectSnap.data}');
+              return const CircularProgressIndicator.adaptive();
+            } else if (snapshot.connectionState == ConnectionState.none) {
+              return const Center(
+                child: Text("History is Empty"),
               );
             }
-            return const Center(
-              child: Text("History is Empty"),
+            return ListView.builder(
+              itemCount: snapshot.data?.length,
+              itemBuilder: (context, index) {
+                var math = snapshot.data?[index];
+                return ListTile(
+                  title: InkWell(
+                    onTap: () {
+                      input.clear();
+
+                      setState(() {
+                        output = "";
+                        input.value = input.value.replaced(
+                            TextRange.collapsed(input.selection.baseOffset),
+                            math["input"]);
+                      });
+                      if (isPhone) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: Text(
+                      math["input"],
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                  ),
+                  subtitle: Text(
+                    math["output"],
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                );
+              },
             );
           }),
     );
