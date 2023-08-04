@@ -68,5 +68,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: release-apk
-          path: ${{ env.APK_BUILD_DIR }}/build/app/outputs/flutter-apk/*.apk
+          path: ${{ env.APK_BUILD_DIR }}/build/app/outputs/flutter-apk/app-release.apk
           
