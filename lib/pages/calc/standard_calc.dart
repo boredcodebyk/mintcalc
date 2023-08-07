@@ -352,6 +352,7 @@ class _StdCalcState extends State<StdCalc> {
               setState(() {
                 input.clear();
                 output = input.text;
+                HapticFeedback.lightImpact();
               });
             },
             child: const Text(
@@ -376,7 +377,11 @@ class _StdCalcState extends State<StdCalc> {
         _buildCalcButton(".", false),
         _buildCalcButton("0", false),
         FilledButton.tonal(
-            onPressed: () => _bkspc(),
+            onPressed: () {
+              _bkspc();
+
+              HapticFeedback.lightImpact();
+            },
             child: const Icon(
               Icons.backspace_outlined,
               size: 32,

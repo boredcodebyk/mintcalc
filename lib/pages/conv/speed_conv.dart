@@ -292,7 +292,11 @@ class _SpeedConvState extends State<SpeedConv> {
             )),
         _buildButtons("C", false),
         FilledButton(
-            onPressed: () => _bkspc(),
+            onPressed: () {
+              _bkspc();
+
+              HapticFeedback.lightImpact();
+            },
             child: const Icon(
               Icons.backspace_outlined,
               size: 32,

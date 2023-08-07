@@ -435,7 +435,11 @@ class _AngleConvState extends State<AngleConv> {
             )),
         _buildButtons("C", false),
         FilledButton(
-            onPressed: () => _bkspc(),
+            onPressed: () {
+              _bkspc();
+
+              HapticFeedback.lightImpact();
+            },
             child: const Icon(
               Icons.backspace_outlined,
               size: 32,

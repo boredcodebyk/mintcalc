@@ -292,7 +292,11 @@ class _PressureConvState extends State<PressureConv> {
             )),
         _buildButtons("C", false),
         FilledButton(
-            onPressed: () => _bkspc(),
+            onPressed: () {
+              _bkspc();
+
+              HapticFeedback.lightImpact();
+            },
             child: const Icon(
               Icons.backspace_outlined,
               size: 32,
