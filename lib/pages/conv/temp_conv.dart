@@ -529,7 +529,10 @@ class _TemperatureConvState extends State<TemperatureConv> {
             height: 32,
             width: 72,
             child: FilledButton.tonal(
-                onPressed: () => _convFunc(label),
+                onPressed: () {
+                  _convFunc(label);
+                  HapticFeedback.lightImpact();
+                },
                 child: Text(
                   label,
                   style: const TextStyle(
@@ -541,7 +544,10 @@ class _TemperatureConvState extends State<TemperatureConv> {
             height: 32,
             width: 72,
             child: FilledButton(
-                onPressed: () => _convFunc(label),
+                onPressed: () {
+                  _convFunc(label);
+                  HapticFeedback.lightImpact();
+                },
                 child: Text(
                   label,
                   style: const TextStyle(
