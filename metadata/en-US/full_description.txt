@@ -2,9 +2,9 @@ A simple calculator and unit converter app with Material Design 3 inspired by Wi
 
 Features
  - Standard Calculator 
+ - Calculator history
  - Date Calculator 
  - Simple unit converter (Angle, Time, Data, Length, Area, Volume, etc...)
 
 Planned updates
  - Scientific calculator
- - Calculator history
